@@ -10,8 +10,38 @@ class CategoryController extends Controller
     // List all categories
     public function index()
     {
+        // Fetch all categories with their related products
         $categories = Category::with('products')->get();
-        return response()->json($categories, 200);
+
+        // Return the response in the desired format
+        return response()->json([
+            'data' => $categories
+        ], 200);
+    }
+    
+    public function getProductsByCategory($id)
+    {
+        // Find the category by ID and load related products
+        $category = Category::with('products')->find($id);
+
+        // If the category is not found, return a 404 response
+        if (!$category) {
+            return response()->json(['message' => 'Category not found'], 404);
+        }
+
+        // Return category and products under the 'data' key
+        return response()->json([
+            'data' => [
+                'products' => $category->products,
+                'category' => [
+                    'id' => $category->id,
+                    'name' => $category->name,
+                    'description' => $category->description,
+                    'created_at' => $category->created_at,
+                    'updated_at' => $category->updated_at
+                ],
+            ]
+        ], 200);
     }
 
     // Show a single category with its products
