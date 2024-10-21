@@ -8,11 +8,15 @@ use Illuminate\Database\Eloquent\Model;
 class Product extends Model
 {
     use HasFactory;
-
+    protected $table = 'products';
     protected $fillable = ['name', 'description', 'price', 'image_path', 'category_id'];
 
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+    public function getImageUrlAttribute()
+    {
+        return url('storage/images/' . $this->image_path);
     }
 }

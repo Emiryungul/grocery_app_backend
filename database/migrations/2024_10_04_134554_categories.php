@@ -10,14 +10,15 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up()
-    {
-        Schema::create('categories', function (Blueprint $table) {
-            $table->id(); // Primary key
-            $table->string('name'); // Name of the category
-            $table->text('description')->nullable(); // Optional description of the category
-            $table->timestamps(); // Timestamps for created_at and updated_at
-        });
-    }
+{
+    Schema::create('categories', function (Blueprint $table) {
+        $table->id();
+        $table->string('name');
+        $table->text('description')->nullable();
+        $table->string('image_path'); // Image path column
+        $table->timestamps();
+    });
+}
 
 
     /**

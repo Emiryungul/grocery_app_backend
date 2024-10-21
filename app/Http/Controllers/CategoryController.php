@@ -10,36 +10,48 @@ class CategoryController extends Controller
     // List all categories
     public function index()
     {
-        // Fetch all categories with their related products
+        // Fetch all categories with related products
         $categories = Category::with('products')->get();
 
-        // Return the response in the desired format
-        return response()->json([
-            'data' => $categories
-        ], 200);
+        // Add the image URL to each category
+        $categoriesWithImages = $categories->map(function ($category) {
+            return [
+                'id' => $category->id,
+                'name' => $category->name,
+                'description' => $category->description,
+                'image_url' => $category->image_url, // Include the image URL
+                'products' => $category->products,
+                'created_at' => $category->created_at,
+                'updated_at' => $category->updated_at,
+            ];
+        });
+
+        // Return the modified response
+        return response()->json(['data' => $categoriesWithImages], 200);
     }
-    
+
+    // Get products by category ID
     public function getProductsByCategory($id)
     {
-        // Find the category by ID and load related products
+        // Find the category by ID with products
         $category = Category::with('products')->find($id);
 
-        // If the category is not found, return a 404 response
         if (!$category) {
             return response()->json(['message' => 'Category not found'], 404);
         }
 
-        // Return category and products under the 'data' key
+        // Return category with products and image URL
         return response()->json([
             'data' => [
-                'products' => $category->products,
                 'category' => [
                     'id' => $category->id,
                     'name' => $category->name,
                     'description' => $category->description,
+                    'image_url' => $category->image_url, // Include the image URL
                     'created_at' => $category->created_at,
-                    'updated_at' => $category->updated_at
+                    'updated_at' => $category->updated_at,
                 ],
+                'products' => $category->products,
             ]
         ], 200);
     }
@@ -53,7 +65,16 @@ class CategoryController extends Controller
             return response()->json(['message' => 'Category not found'], 404);
         }
 
-        return response()->json($category, 200);
+        // Include the image URL in the response
+        return response()->json([
+            'id' => $category->id,
+            'name' => $category->name,
+            'description' => $category->description,
+            'image_url' => $category->image_url, // Include the image URL
+            'products' => $category->products,
+            'created_at' => $category->created_at,
+            'updated_at' => $category->updated_at,
+        ], 200);
     }
 
     // Create a new category
@@ -67,7 +88,7 @@ class CategoryController extends Controller
     public function update(Request $request, $id)
     {
         $category = Category::find($id);
- 
+
         if (!$category) {
             return response()->json(['message' => 'Category not found'], 404);
         }
