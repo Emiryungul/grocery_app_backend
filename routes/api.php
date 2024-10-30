@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CartController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -17,3 +18,7 @@ Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
 // products endpoint
 Route::get('/categories/{id}/products', [CategoryController::class, 'getProductsByCategory']);
 Route::get('/products', [ProductController::class, 'index']);
+
+//cart endpoints
+Route::post('/cart', [CartController::class, 'store']); // Add product to cart
+Route::get('/cart', [CartController::class, 'index']);  // Get all cart items
