@@ -10,18 +10,20 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up()
-{
-    Schema::create('cart', function (Blueprint $table) {
-        $table->id();
-        $table->unsignedBigInteger('product_id');
-        $table->integer('quantity')->default(1); // Stores the number of times a product is added
-        $table->timestamps();
-
-        // Foreign key to ensure product_id exists in the products table
-        $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
-    });
-}
-
+    {
+        Schema::create('cart', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('user_id'); // New user_id column
+            $table->unsignedBigInteger('product_id');
+            $table->integer('quantity')->default(1);
+            $table->timestamps();
+    
+            // Foreign keys
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
+        });
+    }
+    
 
     /**
      * Reverse the migrations.

@@ -21,8 +21,11 @@ Route::get('/categories/{id}/products', [CategoryController::class, 'getProducts
 Route::get('/products', [ProductController::class, 'index']);
 
 //cart endpoints
-Route::post('/cart', [CartController::class, 'store']); // Add product to cart
-Route::get('/cart', [CartController::class, 'index']);  // Get all cart items
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/cart', [CartController::class, 'store']);
+    Route::get('/cart', [CartController::class, 'index']);
+});
+
 
 //Auth endpoints
 Route::post('/register', [AuthController::class, 'register']);
