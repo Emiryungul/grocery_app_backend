@@ -19,6 +19,7 @@ Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
 // products endpoint
 Route::get('/categories/{id}/products', [CategoryController::class, 'getProductsByCategory']);
 Route::get('/products', [ProductController::class, 'index']);
+Route::get('products/{id}', [ProductController::class, 'show']);
 
 //cart endpoints
 Route::middleware('auth:sanctum')->group(function () {

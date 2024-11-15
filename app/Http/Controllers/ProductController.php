@@ -18,4 +18,14 @@ class ProductController extends Controller
             'data' => $products
         ], 200);
     }
+    public function show($id)
+    {
+        $product = Product::with('category')->find($id);
+
+        if (!$product) {
+            return response()->json(['error' => 'Product not found'], 404);
+        }
+
+        return response()->json($product);
+    }
 }
