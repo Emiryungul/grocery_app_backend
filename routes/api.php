@@ -6,6 +6,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\FavoriteController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -25,9 +26,13 @@ Route::get('products/{id}', [ProductController::class, 'show']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/cart', [CartController::class, 'store']);
     Route::get('/cart', [CartController::class, 'index']);
+    Route::post('/favorites', [FavoriteController::class, 'store']);
+    Route::get('/favorites', [FavoriteController::class, 'index']);
 });
 
 
 //Auth endpoints
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+
+

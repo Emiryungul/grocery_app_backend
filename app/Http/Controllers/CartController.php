@@ -6,6 +6,7 @@ use App\Models\Cart;
 use App\Models\User;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB; 
 
 class CartController extends Controller
 {
@@ -34,8 +35,19 @@ class CartController extends Controller
         ]);
     }
 
-    return response()->json(['message' => 'Product added to cart successfully'], 201);
+    // Calculate the total price for the user's cart
+    $totalPrice = Cart::where('user_id', $user->id)
+        ->join('products', 'cart.product_id', '=', 'products.id')
+        ->sum(DB::raw('cart.quantity * products.price'));
+
+    return response()->json([
+        'message' => 'Product added to cart successfully',
+        'meta' => [
+            'totalPrice' => $totalPrice,
+        ],
+    ], 201);
 }
+
 
     
 public function index(Request $request)
@@ -55,10 +67,20 @@ public function index(Request $request)
         ];
     });
 
+    // Calculate the total price
+    $totalPrice = $cartItems->sum(function ($item) {
+        return $item->quantity * $item->product->price;
+    });
+
     return response()->json([
         'data' => $data,
+        'meta' => [
+            'totalPrice' => $totalPrice,
+            'message' => 'Cart items retrieved successfully',
+        ],
     ], 200);
 }
+
 
 
 }
