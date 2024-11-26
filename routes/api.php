@@ -7,6 +7,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FavoriteController;
+use App\Http\Controllers\AddressesController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -28,7 +29,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/cart', [CartController::class, 'index']);
     Route::post('/favorites', [FavoriteController::class, 'store']);
     Route::get('/favorites', [FavoriteController::class, 'index']);
+    Route::post('/addresses', [AddressController::class, 'store']); // Create a new address
+    Route::get('/addresses', [AddressController::class, 'index']); // List all addresses for the authenticated user
 });
+
+
+
 
 
 //Auth endpoints
