@@ -7,7 +7,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FavoriteController;
-use App\Http\Controllers\AddressesController;
+use App\Http\Controllers\AddressController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
