@@ -12,6 +12,7 @@ use App\Http\Controllers\AddressController;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
+
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/categories/{id}', [CategoryController::class, 'show']);
 Route::post('/categories', [CategoryController::class, 'store']);
@@ -29,13 +30,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/cart', [CartController::class, 'index']);
     Route::post('/favorites', [FavoriteController::class, 'store']);
     Route::get('/favorites', [FavoriteController::class, 'index']);
-    Route::post('/addresses', [AddressController::class, 'store']); // Create a new address
-    Route::get('/addresses', [AddressController::class, 'index']); // List all addresses for the authenticated user
+    Route::post('/addresses', [AddressController::class, 'store']);
+    Route::get('/addresses', [AddressController::class, 'index']); 
+    Route::delete('/addresses/{id}', [AddressController::class, 'destroy']);
 });
-
-
-
-
 
 //Auth endpoints
 Route::post('/register', [AuthController::class, 'register']);

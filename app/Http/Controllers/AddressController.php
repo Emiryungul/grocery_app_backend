@@ -45,4 +45,22 @@ class AddressController extends Controller
             'addresses' => $addresses,
         ], 200);
     }
+    
+    public function destroy($id)
+{
+    $address = Address::where('user_id', auth()->id())->find($id);
+
+    if (!$address) {
+        return response()->json([
+            'message' => 'Address not found or does not belong to the user.'
+        ], 404);
+    }
+
+    $address->delete();
+
+    return response()->json([
+        'message' => 'Address deleted successfully.'
+    ], 200);
+}
+
 }
