@@ -1,153 +1,149 @@
-Grocery Application API
+# Grocery Application API
 
 Welcome to the Grocery Application API! This project provides a comprehensive backend for managing a grocery application, including user authentication, product management, and order handling.
 
-Features
+# Features
 
-Authentication: Powered by Laravel Sanctum for secure and scalable token-based authentication.
+- **Authentication**: Powered by Laravel Sanctum for secure and scalable token-based authentication.
+- **Product Management**: Add, update, delete, and fetch product information.
+- **Categories**: Organize products into categories for easier navigation.
+- **Cart Functionality**: Manage user-specific carts with automatic quantity adjustments.
+- **Order Management**: Place and manage orders.
+- **Favorites**: Allow users to save and manage their favorite products.
+- **Secure and Scalable**: Built with Laravel's best practices.
 
-Product Management: Add, update, delete, and fetch product information.
+# Installation
 
-Categories: Organize products into categories for easier navigation.
+## Prerequisites
 
-Cart Functionality: Manage user-specific carts with automatic quantity adjustments.
+- PHP >= 8.1
+- Composer
+- MySQL
+- Laravel >= 10
 
-Order Management: Place and manage orders.
+## Steps
 
-Favorites: Allow users to save and manage their favorite products.
+1. Clone the repository:
 
-Secure and Scalable: Built with Laravel's best practices.
+   ```bash
+   git clone https://github.com/yourusername/grocery-api.git
+   cd grocery-api
+   ```
 
-Installation
+2. Install dependencies:
 
-Prerequisites
+   ```bash
+   composer install
+   ```
 
-PHP >= 8.1
+3. Set up the environment:
+   - Copy the `.env.example` file to `.env`:
+     ```bash
+     cp .env.example .env
+     ```
+   - Update database credentials in the `.env` file:
+     ```env
+     DB_CONNECTION=mysql
+     DB_HOST=127.0.0.1
+     DB_PORT=3306
+     DB_DATABASE=grocery_db
+     DB_USERNAME=root
+     DB_PASSWORD=yourpassword
+     ```
 
-Composer
+4. Generate the application key:
 
-MySQL
+   ```bash
+   php artisan key:generate
+   ```
 
-Laravel >= 10
+5. Run migrations and seed the database:
 
-Steps
+   ```bash
+   php artisan migrate --seed
+   ```
 
-Clone the repository:
+6. Start the development server:
 
-git clone https://github.com/yourusername/grocery-api.git
-cd grocery-api
+   ```bash
+   php artisan serve
+   ```
 
-Install dependencies:
+   The API will be available at `http://127.0.0.1:8000`.
 
-composer install
-
-Set up the environment:
-
-Copy the .env.example file to .env:
-
-cp .env.example .env
-
-Update database credentials in the .env file:
-
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=grocery_db
-DB_USERNAME=root
-DB_PASSWORD=yourpassword
-
-Generate the application key:
-
-php artisan key:generate
-
-Run migrations and seed the database:
-
-php artisan migrate --seed
-
-Start the development server:
-
-php artisan serve
-
-The API will be available at http://127.0.0.1:8000.
-
-Authentication
+# Authentication
 
 Laravel Sanctum is used for authentication. To test API endpoints, include the following header in your requests:
 
+```http
 Authorization: Bearer {token}
+```
 
-API Endpoints
+# API Endpoints
 
-Authentication
+## Authentication
 
-Register: POST /api/register
+- **Register**: `POST /api/register`
+  - Fields: `name`, `email`, `password`, `password_confirmation`
 
-Fields: name, email, password, password_confirmation
+- **Login**: `POST /api/login`
+  - Fields: `email`, `password`
 
-Login: POST /api/login
+- **Logout**: `POST /api/logout`
 
-Fields: email, password
+## Products
 
-Logout: POST /api/logout
+- **List Products**: `GET /api/products`
+- **Add Product**: `POST /api/products`
+  - Fields: `name`, `price`, `category_id`, `description`, `image`
+- **Update Product**: `PUT /api/products/{id}`
+- **Delete Product**: `DELETE /api/products/{id}`
 
-Products
+## Categories
 
-List Products: GET /api/products
+- **List Categories**: `GET /api/categories`
+- **Add Category**: `POST /api/categories`
+  - Fields: `name`
+- **Update Category**: `PUT /api/categories/{id}`
+- **Delete Category**: `DELETE /api/categories/{id}`
 
-Add Product: POST /api/products
+## Cart
 
-Fields: name, price, category_id, description, image
+- **View Cart**: `GET /api/cart`
+- **Add to Cart**: `POST /api/cart`
+  - Fields: `product_id`, `quantity`
+- **Remove from Cart**: `DELETE /api/cart/{id}`
 
-Update Product: PUT /api/products/{id}
+## Favorites
 
-Delete Product: DELETE /api/products/{id}
+- **View Favorites**: `GET /api/favorites`
+- **Add to Favorites**: `POST /api/favorites`
+  - Fields: `product_id`
+- **Remove from Favorites**: `DELETE /api/favorites/{id}`
 
-Categories
+## Orders
 
-List Categories: GET /api/categories
+- **Place Order**: `POST /api/orders`
+  - Fields: `cart_id`
+- **View Orders**: `GET /api/orders`
 
-Add Category: POST /api/categories
+# Database File
 
-Fields: name
+Include your MySQL dump file (`.sql`) in the `database/` directory for easy setup. Ensure to mention the file path in the `.env` file:
 
-Update Category: PUT /api/categories/{id}
-
-Delete Category: DELETE /api/categories/{id}
-
-Cart
-
-View Cart: GET /api/cart
-
-Add to Cart: POST /api/cart
-
-Fields: product_id, quantity
-
-Remove from Cart: DELETE /api/cart/{id}
-
-Favorites
-
-View Favorites: GET /api/favorites
-
-Add to Favorites: POST /api/favorites
-
-Fields: product_id
-
-Remove from Favorites: DELETE /api/favorites/{id}
-
-Orders
-
-Place Order: POST /api/orders
-
-Fields: cart_id
-
-View Orders: GET /api/orders
-
-Database File
-
-Include your MySQL dump file (.sql) in the database/ directory for easy setup. Ensure to mention the file path in the .env file:
-
+```env
 DB_DUMP_FILE=database/grocery_db.sql
+```
 
-License
+# License
 
-This project is licensed under the MIT License.
+This project is licensed under the [MIT License](LICENSE).
+
+# Contributing
+
+Pull requests are welcome. For significant changes, please open an issue first to discuss what you would like to change.
+
+# Contact
+
+For inquiries, contact us at [your_email@example.com](mailto:your_email@example.com).
+
