@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Cart;
 use App\Models\User;
 use App\Models\Product;
+use App\Models\Address;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB; 
 
@@ -48,6 +49,39 @@ class CartController extends Controller
     ], 201);
 }
 
+public function payforthecart(Request $request)
+{
+    $request->validate([
+        'address_id' => 'required|exists:addresses,id',
+    ]);
+
+    // Ensure the address belongs to the authenticated user
+    $address = Address::where('id', $request->address_id)
+        ->where('user_id', auth()->id())
+        ->first();
+
+    if (!$address) {
+        return response()->json([
+            'message' => 'Invalid address ID or address does not belong to the user.'
+        ], 404);
+    }
+
+    // Get all cart items for the authenticated user
+    $cartItems = Cart::where('user_id', auth()->id());
+
+    if (!$cartItems->exists()) {
+        return response()->json([
+            'message' => 'Cart is already empty.'
+        ], 400);
+    }
+
+    // Delete all cart items
+    $cartItems->delete();
+
+    return response()->json([
+        'message' => 'Cart items have been successfully processed and deleted.'
+    ], 200);
+}
 
     
 public function index(Request $request)

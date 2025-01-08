@@ -33,6 +33,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/addresses', [AddressController::class, 'store']);
     Route::get('/addresses', [AddressController::class, 'index']); 
     Route::delete('/addresses/{id}', [AddressController::class, 'destroy']);
+    Route::post('/cart/pay', [CartController::class, 'payforthecart']);
 });
 
 //Auth endpoints
