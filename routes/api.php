@@ -34,6 +34,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/addresses', [AddressController::class, 'index']); 
     Route::delete('/addresses/{id}', [AddressController::class, 'destroy']);
     Route::post('/cart/pay', [CartController::class, 'payforthecart']);
+    Route::delete('/cart/{id}', [CartController::class, 'deleteCartItem']);
 });
 
 //Auth endpoints

@@ -18,70 +18,93 @@ class CartController extends Controller
         'product_id' => 'required|exists:products,id',
     ]);
 
-    $user = $request->user(); // Get authenticated user
-    $product_id = $request->product_id;
+    // Find the product by its ID
+    $product = Product::find($request->product_id);
 
-    // Check if the product is already in the cart for this user
-    $cartItem = Cart::where('user_id', $user->id)->where('product_id', $product_id)->first();
-
-    if ($cartItem) {
-        // If it exists, increase the quantity
-        $cartItem->increment('quantity');
-    } else {
-        // If it doesn't exist, create a new entry
-        Cart::create([
-            'user_id' => $user->id,
-            'product_id' => $product_id,
-            'quantity' => 1,
-        ]);
-    }
-
-    // Calculate the total price for the user's cart
-    $totalPrice = Cart::where('user_id', $user->id)
-        ->join('products', 'cart.product_id', '=', 'products.id')
-        ->sum(DB::raw('cart.quantity * products.price'));
-
-    return response()->json([
-        'message' => 'Product added to cart successfully',
-        'meta' => [
-            'totalPrice' => $totalPrice,
-        ],
-    ], 201);
-}
-
-public function payforthecart(Request $request)
-{
-    $request->validate([
-        'address_id' => 'required|exists:addresses,id',
-    ]);
-
-    // Ensure the address belongs to the authenticated user
-    $address = Address::where('id', $request->address_id)
-        ->where('user_id', auth()->id())
-        ->first();
-
-    if (!$address) {
+    // Check if the product has stock available
+    if ($product->stock <= 0) {
         return response()->json([
-            'message' => 'Invalid address ID or address does not belong to the user.'
-        ], 404);
-    }
-
-    // Get all cart items for the authenticated user
-    $cartItems = Cart::where('user_id', auth()->id());
-
-    if (!$cartItems->exists()) {
-        return response()->json([
-            'message' => 'Cart is already empty.'
+            'message' => 'This product is out of stock and cannot be added to the cart.',
         ], 400);
     }
 
-    // Delete all cart items
-    $cartItems->delete();
+    // Add the product to the cart or update its quantity
+    $cartItem = Cart::updateOrCreate(
+        [
+            'user_id' => auth()->id(),
+            'product_id' => $request->product_id,
+        ],
+        [
+            'quantity' => \DB::raw('quantity + 1'), // Increment quantity by 1
+        ]
+    );
 
     return response()->json([
-        'message' => 'Cart items have been successfully processed and deleted.'
+        'message' => 'Product added to cart successfully.',
+        'cart_item' => $cartItem,
     ], 200);
 }
+
+
+
+public function payForTheCart(Request $request)
+{
+    $user = auth()->user();
+    $addressId = $request->address_id;
+
+    // Retrieve all cart items for the user
+    $cartItems = Cart::where('user_id', $user->id)->with('product')->get();
+
+    // Check stock availability
+    foreach ($cartItems as $item) {
+        if ($item->quantity > $item->product->stock) {
+            return response()->json([
+                'message' => 'Insufficient stock for product: ' . $item->product->name
+            ], 400);
+        }
+    }
+
+    // Deduct stock and clear the cart
+    foreach ($cartItems as $item) {
+        $item->product->decrement('stock', $item->quantity); // Reduce stock
+    }
+
+    // Delete all cart items
+    Cart::where('user_id', $user->id)->delete();
+
+    return response()->json([
+        'message' => 'Order processed successfully, and stock updated.'
+    ], 200);
+}
+
+
+public function deleteCartItem(Request $request, $cartItemId)
+{
+    // Retrieve the cart item and ensure it belongs to the authenticated user
+    $cartItem = Cart::where('id', $cartItemId)
+        ->where('user_id', auth()->id())
+        ->first();
+
+    // Check if the cart item exists
+    if (!$cartItem) {
+        return response()->json([
+            'message' => 'Cart item not found or does not belong to the user.'
+        ], 404);
+    }
+
+    // Decrease quantity by 1
+    if ($cartItem->quantity > 1) {
+        $cartItem->decrement('quantity');
+    } else {
+        // If quantity is 1, delete the item
+        $cartItem->delete();
+    }
+
+    return response()->json([
+        'message' => 'Cart item updated successfully.'
+    ], 200);
+}
+
 
     
 public function index(Request $request)
