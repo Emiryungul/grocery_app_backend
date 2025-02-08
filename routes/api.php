@@ -8,6 +8,8 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\AddressController;
+use App\Http\Controllers\OrderController;
+
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -22,7 +24,7 @@ Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
 // products endpoint
 Route::get('/categories/{id}/products', [CategoryController::class, 'getProductsByCategory']);
 Route::get('/products', [ProductController::class, 'index']);
-Route::get('products/{id}', [ProductController::class, 'show']);
+Route::get('/products/{id}', [ProductController::class, 'show']);
 
 //cart endpoints
 Route::middleware('auth:sanctum')->group(function () {
@@ -35,6 +37,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/addresses/{id}', [AddressController::class, 'destroy']);
     Route::post('/cart/pay', [CartController::class, 'payforthecart']);
     Route::delete('/cart/{id}', [CartController::class, 'deleteCartItem']);
+    Route::get('/order-history', [OrderController::class, 'orderHistory']);
+
 });
 
 //Auth endpoints

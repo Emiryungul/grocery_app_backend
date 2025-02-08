@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Cart;
 use App\Models\User;
 use App\Models\Product;
+use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Address;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB; 
@@ -49,33 +51,54 @@ class CartController extends Controller
 
 public function payForTheCart(Request $request)
 {
-    $user = auth()->user();
-    $addressId = $request->address_id;
+    $request->validate([
+        'address_id' => 'required|exists:addresses,id',
+    ]);
 
-    // Retrieve all cart items for the user
+    $user = auth()->user();
     $cartItems = Cart::where('user_id', $user->id)->with('product')->get();
 
-    // Check stock availability
-    foreach ($cartItems as $item) {
-        if ($item->quantity > $item->product->stock) {
-            return response()->json([
-                'message' => 'Insufficient stock for product: ' . $item->product->name
-            ], 400);
-        }
+    if ($cartItems->isEmpty()) {
+        return response()->json([
+            'message' => 'Your cart is empty.'
+        ], 400);
     }
 
-    // Deduct stock and clear the cart
+    // Calculate total price
+    $totalPrice = $cartItems->sum(function ($item) {
+        return $item->quantity * $item->product->price;
+    });
+
+    // Create the order
+    $order = Order::create([
+        'user_id' => $user->id,
+        'address_id' => $request->address_id,
+        'total_price' => $totalPrice,
+        'status' => 'Paid',
+    ]);
+
+    // Add items to the order
     foreach ($cartItems as $item) {
-        $item->product->decrement('stock', $item->quantity); // Reduce stock
+        OrderItem::create([
+            'order_id' => $order->id,
+            'product_id' => $item->product_id,
+            'quantity' => $item->quantity,
+            'price' => $item->product->price,
+        ]);
+
+        // Deduct stock from the product
+        $item->product->decrement('stock', $item->quantity);
     }
 
-    // Delete all cart items
+    // Clear the user's cart
     Cart::where('user_id', $user->id)->delete();
 
     return response()->json([
-        'message' => 'Order processed successfully, and stock updated.'
+        'message' => 'Order placed successfully.',
+        'order' => $order,
     ], 200);
 }
+
 
 
 public function deleteCartItem(Request $request, $cartItemId)
